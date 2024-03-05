@@ -1,0 +1,12 @@
+data_dir = "/opt/nomad/client"
+bind_addr = "0.0.0.0"
+
+client {
+  enabled = true
+  node_class = "client"
+  servers = [
+    {% for host in groups['nomad_servers'] %}
+    "{{ hostvars[host]['ansible_host'] }}:4647"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

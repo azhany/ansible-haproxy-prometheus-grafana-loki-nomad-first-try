@@ -1,0 +1,25 @@
+---
+- name: Install HAProxy and Configure Least Response Time Algorithm
+  hosts: your_haproxy_server
+  become: yes
+  
+  tasks:
+    - name: Install HAProxy package
+      apt:
+        name: haproxy
+        state: present
+
+    - name: Configure HAProxy
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart HAProxy
+      systemd:
+        name: haproxy
+        state: restarted
+
+# ansible-playbook install_configure_haproxy.yml

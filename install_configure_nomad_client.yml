@@ -1,0 +1,28 @@
+---
+- name: Install and Configure Nomad Client
+  hosts: localhost
+  become: yes
+  
+  tasks:
+    - name: Install Nomad
+      apt:
+        name: nomad
+        state: present
+
+    - name: Create Nomad client configuration directory
+      file:
+        path: /etc/nomad.d
+        state: directory
+
+    - name: Copy Nomad client configuration file
+      template:
+        src: nomad-client.hcl.j2
+        dest: /etc/nomad.d/client.hcl
+
+    - name: Start and enable Nomad client service
+      systemd:
+        name: nomad
+        enabled: yes
+        state: started
+
+# ansible-playbook -i inventory.ini install_configure_nomad_client.yml

@@ -1,0 +1,47 @@
+---
+- name: Install and Configure Prometheus and Grafana
+  hosts: localhost
+  become: yes
+  
+  tasks:
+    - name: Install packages
+      apt:
+        name: ['prometheus', 'grafana']
+        state: present
+
+    - name: Configure Prometheus
+      template:
+        src: prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+      notify: restart prometheus
+
+    - name: Start and enable Prometheus service
+      systemd:
+        name: prometheus
+        enabled: yes
+        state: started
+
+    - name: Configure Grafana data source
+      template:
+        src: grafana_datasource.yml.j2
+        dest: /etc/grafana/provisioning/datasources/datasource.yml
+      notify: restart grafana
+
+    - name: Start and enable Grafana service
+      systemd:
+        name: grafana-server
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: restart prometheus
+      systemd:
+        name: prometheus
+        state: restarted
+    
+    - name: restart grafana
+      systemd:
+        name: grafana-server
+        state: restarted
+
+# ansible-playbook install_configure_prometheus_grafana.yml

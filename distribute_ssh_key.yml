@@ -1,0 +1,19 @@
+---
+- name: Distribute SSH Key to Target Hosts
+  hosts: all
+  become: yes
+  
+  tasks:
+    - name: Install sshpass
+      apt:
+        name: sshpass
+        state: present
+      become: yes
+      when: ansible_os_family == "Ubuntu"
+
+    - name: Copy public key to authorized_keys
+      authorized_key:
+        user: your_username
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+# ansible-playbook distribute_ssh_key.yml -i inventory.ini

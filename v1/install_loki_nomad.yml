@@ -1,0 +1,21 @@
+---
+- name: Install Grafana Loki and Nomad Client Agent
+  hosts: your_target_server
+  become: yes
+  
+  tasks:
+    - name: Install packages
+      apt:
+        name: ['grafana-loki', 'nomad']
+        state: present
+
+    - name: Enable and start services
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      loop:
+        - grafana-loki
+        - nomad
+
+# ansible-playbook install_loki_nomad.yml

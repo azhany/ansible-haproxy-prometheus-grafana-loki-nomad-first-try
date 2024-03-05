@@ -1,0 +1,23 @@
+---
+- name: Install Apache, PHP, Git and Configure Nomad Servers
+  hosts: your_nomad_servers
+  become: yes
+  
+  tasks:
+    - name: Install packages
+      apt:
+        name: ['apache2', 'php', 'git']
+        state: present
+
+    - name: Configure Nomad servers
+      template:
+        src: nomad_config.hcl.j2
+        dest: /etc/nomad/nomad_config.hcl
+
+    - name: Clone Git repository
+      git:
+        repo: your_git_repo_url
+        dest: /var/www/html/myapp
+      when: inventory_hostname in groups['your_nomad_servers']
+
+# ansible-playbook install_configure_nomad_servers.yml

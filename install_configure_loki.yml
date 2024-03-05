@@ -1,0 +1,30 @@
+---
+- name: Install and Configure Grafana Loki
+  hosts: localhost
+  become: yes
+  
+  tasks:
+    - name: Install package
+      apt:
+        name: grafana-loki
+        state: present
+
+    - name: Configure Loki
+      template:
+        src: loki-config.yml.j2
+        dest: /etc/loki/local-config.yaml
+      notify: restart loki
+
+    - name: Start and enable Loki service
+      systemd:
+        name: grafana-loki
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: restart loki
+      systemd:
+        name: grafana-loki
+        state: restarted
+
+# ansible-playbook install_configure_loki.yml

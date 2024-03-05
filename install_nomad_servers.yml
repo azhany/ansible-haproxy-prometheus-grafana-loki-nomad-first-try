@@ -1,0 +1,29 @@
+---
+- name: Install Apache, PHP, Git and Clone Git Repository on Nomad Servers
+  hosts: nomad_servers
+  become: yes
+
+  tasks:
+    - name: Install packages
+      apt:
+        name: ['apache2', 'php', 'git']
+        state: present
+
+    - name: Configure Git credentials
+      template:
+        src: git-credentials.j2
+        dest: /home/{{ ansible_user }}/.git-credentials
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+      
+    - name: Clone Git repository
+      git:
+        repo: your_git_repo_url
+        dest: /var/www/html/myapp
+        accept_hostkey: yes
+        key_file: /home/{{ ansible_user }}/.ssh/id_rsa
+      vars_files:
+        - /home/{{ ansible_user }}/.git-credentials
+
+# ansible-playbook -i inventory.ini install_nomad_servers.yml
